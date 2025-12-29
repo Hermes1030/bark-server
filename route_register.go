@@ -14,6 +14,17 @@ type DeviceInfo struct {
 	OldDeviceToken string `form:"devicetoken,omitempty" json:"devicetoken,omitempty" xml:"devicetoken,omitempty" query:"devicetoken,omitempty"`
 }
 
+type AndroidDevice struct {
+    ID          string `json:"id"`
+    DeviceToken string `json:"device_token"`
+    DeviceName  string `json:"device_name"`
+    Platform    string `json:"platform"` // "android"
+    UserID      string `json:"user_id"`
+    CreatedAt   int64  `json:"created_at"`
+    UpdatedAt   int64  `json:"updated_at"`
+}
+
+
 func init() {
 	registerRoute("register", func(router fiber.Router) {
 		router.Post("/register", func(c *fiber.Ctx) error { return doRegister(c, false) })
@@ -85,3 +96,37 @@ func doRegisterCheck(c *fiber.Ctx) error {
 	}
 	return c.Status(200).JSON(success())
 }
+
+func registerAndroidDevice(c *fiber.Ctx) error {
+    // 解析请求体
+    var device AndroidDevice
+    if err := c.BodyParser(&device); err != nil {
+        return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+    }
+
+    // 验证必要字段
+    if device.DeviceToken == "" {
+        return c.Status(400).JSON(fiber.Map{"error": "Device token is required"})
+    }
+
+    // 设置默认值
+    if device.ID == "" {
+        device.ID = generateDeviceID() // 使用现有工具函数
+    }
+    device.Platform = "android"
+    device.CreatedAt = time.Now().Unix()
+    device.UpdatedAt = time.Now().Unix()
+
+    // 保存到数据库
+    err := db.SaveDevice(&device) // 使用数据库层接口
+    if err != nil {
+        return c.Status(500).JSON(fiber.Map{"error": "Failed to register device"})
+    }
+
+    return c.JSON(fiber.Map{
+        "success": true,
+        "device_id": device.ID,
+    })
+}
+
+

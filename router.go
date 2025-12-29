@@ -109,3 +109,9 @@ func data(data interface{}) CommonResp {
 		Data:      data,
 	}
 }
+
+func androidRoute(router fiber.Router) {
+    router.Post("/register/android", registerAndroidDevice)
+    // 可以添加更多路由
+    // router.Get("/android/devices", getAndroidDevices)
+}

@@ -8,3 +8,10 @@ type Database interface {
 	DeleteDeviceByKey(key string) error                     //Delete specified device
 	Close() error                                           //Close the database
 }
+
+type DeviceManager interface {
+    SaveDevice(device *AndroidDevice) error
+    GetDevice(id string) (*AndroidDevice, error)
+    DeleteDevice(id string) error
+    // 其他方法...
+}
