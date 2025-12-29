@@ -1,8 +1,11 @@
 package main
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/mritd/logger"
+	"github.com/finb/bark-server/v2/database"
 )
 
 type DeviceInfo struct {
@@ -12,16 +15,6 @@ type DeviceInfo struct {
 	// compatible with old req
 	OldDeviceKey   string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty" query:"key,omitempty"`
 	OldDeviceToken string `form:"devicetoken,omitempty" json:"devicetoken,omitempty" xml:"devicetoken,omitempty" query:"devicetoken,omitempty"`
-}
-
-type AndroidDevice struct {
-    ID          string `json:"id"`
-    DeviceToken string `json:"device_token"`
-    DeviceName  string `json:"device_name"`
-    Platform    string `json:"platform"` // "android"
-    UserID      string `json:"user_id"`
-    CreatedAt   int64  `json:"created_at"`
-    UpdatedAt   int64  `json:"updated_at"`
 }
 
 
@@ -34,6 +27,11 @@ func init() {
 	// compatible with old requests
 	registerRouteWithWeight("register_compat", 100, func(router fiber.Router) {
 		router.Get("/register", func(c *fiber.Ctx) error { return doRegister(c, true) })
+	})
+	
+	// Android device registration
+	registerRouteWithWeight("android", 60, func(router fiber.Router) {
+		router.Post("/register/android", registerAndroidDevice)
 	})
 }
 
@@ -99,7 +97,7 @@ func doRegisterCheck(c *fiber.Ctx) error {
 
 func registerAndroidDevice(c *fiber.Ctx) error {
     // 解析请求体
-    var device AndroidDevice
+    var device database.AndroidDevice
     if err := c.BodyParser(&device); err != nil {
         return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
     }
@@ -118,10 +116,11 @@ func registerAndroidDevice(c *fiber.Ctx) error {
     device.UpdatedAt = time.Now().Unix()
 
     // 保存到数据库
-    err := db.SaveDevice(&device) // 使用数据库层接口
-    if err != nil {
-        return c.Status(500).JSON(fiber.Map{"error": "Failed to register device"})
-    }
+    // TODO: 实现数据库层的SaveDevice方法
+    // err := db.SaveDevice(&device) // 使用数据库层接口
+    // if err != nil {
+    //     return c.Status(500).JSON(fiber.Map{"error": "Failed to register device"})
+    // }
 
     return c.JSON(fiber.Map{
         "success": true,

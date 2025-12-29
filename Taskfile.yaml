@@ -4,7 +4,7 @@ vars:
   BUILD_VERSION:
     sh: git describe --tags
   BUILD_DATE:
-    sh: date "+%F %T"
+    sh: powershell "Get-Date -Format 'yyyy-MM-dd HH:mm:ss'"
   COMMIT_ID:
     sh: git rev-parse HEAD
   DOCKER_SOCK: /var/run/docker.sock

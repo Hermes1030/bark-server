@@ -9,6 +9,17 @@ type Database interface {
 	Close() error                                           //Close the database
 }
 
+// AndroidDevice represents an Android device registration
+type AndroidDevice struct {
+    ID          string `json:"id"`
+    DeviceToken string `json:"device_token"`
+    DeviceName  string `json:"device_name"`
+    Platform    string `json:"platform"` // "android"
+    UserID      string `json:"user_id"`
+    CreatedAt   int64  `json:"created_at"`
+    UpdatedAt   int64  `json:"updated_at"`
+}
+
 type DeviceManager interface {
     SaveDevice(device *AndroidDevice) error
     GetDevice(id string) (*AndroidDevice, error)

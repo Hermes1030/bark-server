@@ -30,3 +30,7 @@ func RandStringBytesMaskImprSrc(n int) string {
 	}
 	return string(b)
 }
+
+func generateDeviceID() string {
+	return RandStringBytesMaskImprSrc(16)
+}
